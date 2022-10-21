@@ -36,6 +36,7 @@ class ADS1210:
             spi_writebyte(5)
             spi_writebyte(32)
             digital_write(CS_PIN, 1)
+            
 
         def wait_DRY():
             for i in range(0, 40000, 1):
