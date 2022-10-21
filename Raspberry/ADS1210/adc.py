@@ -1,14 +1,64 @@
 import spidev
 import RPi.GPIO as GPIO
 import time
-CS_PIN = 25
-RST_PIN = 7
+CS_PIN_ADC1 = 25
 DRDY_PIN = 8
 
-RD_DATA = 0xC0
-WR_CMD = 0x64
-RD_CMR = 0xE4
-RD_OCR = 0xE4
+RST_PIN = 7
+CS={
+        'ADC1':25,
+        'ADC2':24,
+        'ADC3':23
+}
+DRDY={
+        'ADC1': 8,
+        'ADC2': 22,
+        'ADC3': 27
+}
+CMD = {'RD_DATA': 0xC0,     # Completes SYNC and Exits Standby Mode 0000  0000 (00h)
+       'WR_CMD' : 0x64,      # Read Data 0000  0001 (01h)
+       'RD_CMD' : 0xE4,     # Read Data Continuously 0000   0011 (03h)
+       'RD_OCR' : 0xE4     # Stop Read Data Continuously 0000   1111 (0Fh)
+      }
+Calibration={
+    'Self-calibration':0b001,
+    'Offset-calibration':0b010,
+    'Full-Scale Calibration':0b11,
+    'Predo-System-calibration':0b100,
+    'Background-calibration':0b101,
+}
+
+class ADS1210:
+    def __init__(self):
+        def self_test_adc():
+            reset_adc()
+            digital_write(CS_PIN, 0)
+            spi_writebyte(5)
+            spi_writebyte(32)
+            digital_write(CS_PIN, 1)
+
+        def wait_DRY():
+            for i in range(0, 40000, 1):
+                if (digital_read(DRDY_PIN) == 0):
+                    break
+            if (i >= 39000):
+                print('Time out wait DRDY!')
+
+        def init_adc():
+            CMD = [0b01000010,0x00, 0x00, 0x4D]
+            reset_adc()
+            digital_write(CS_PIN, 0)
+            wait_DRY()
+            spi_writebyte(WR_CMD)
+            delay_ms(1)
+            spi_writebyte(CMD[0])
+            spi_writebyte(CMD[1])
+            spi_writebyte(CMD[2])
+            spi_writebyte(CMD[3])
+            digital_write(CS_PIN, 1)
+            print(CMD)
+# end class ADS1210
+
 
 def digital_write(pin,value):
     GPIO.output(pin,value)
@@ -45,33 +95,7 @@ def cs_adc(channel):
     digital_write(CS_PIN,0)
 
 
-def self_test_adc():
-    reset_adc()
-    digital_write(CS_PIN,0)
-    spi_writebyte(5)
-    spi_writebyte(32)
-    digital_write(CS_PIN,1)
 
-def wait_DRY():
-	for i in range(0,40000,1):
-		if (digital_read(DRDY_PIN) == 0):
-			break
-	if (i>=39000):
-		print('Time out wait DRDY!')
-    
-def init_adc():
-    CMD=[0xE2,0x00,0x00,0x4D]
-    reset_adc()
-    digital_write(CS_PIN,0)
-    wait_DRY()
-    spi_writebyte(WR_CMD)
-    delay_ms(1)
-    spi_writebyte(CMD[0])
-    spi_writebyte(CMD[1])
-    spi_writebyte(CMD[2])
-    spi_writebyte(CMD[3])
-    digital_write(CS_PIN,1)
-    print(CMD)
 
 
 #======================================    
