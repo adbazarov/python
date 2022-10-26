@@ -37,6 +37,7 @@ class ADS1210:
         self.SPI.max_speed_hz = 20000
         self.SPI.mode = 0b01
         self.SPI.no_cs = True
+        self.ampl=0
 
     def self_test_adc(self):
         self.reset_adc()
@@ -102,6 +103,7 @@ class ADS1210:
         byte_2 = self.spi_readbyte(0x01)
         byte_3 = self.spi_readbyte(0x01)
         self.digital_write(CS['ADC1'], 1)
+        self.ampl=((byte_1[0] << 16) | (byte_2[0] << 8) | (byte_3[0])) - 8388608)
         print(byte_1, byte_2, byte_3, ((byte_1[0] << 16) | (byte_2[0] << 8) | (byte_3[0])) - 8388608)
 
 # end class ADS1210
