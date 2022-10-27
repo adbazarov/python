@@ -1,4 +1,7 @@
 import sys
+CMD={'a':1,
+    'b':2
+    }
 def set_bit(value, bit):
     return value | (1<<bit)
 
@@ -17,3 +20,5 @@ DRDY=0
 CMD1=0
 CMD1=set_bit(CMD1,BIAS)
 print(CMD1)
+
+print(CMD['a'])

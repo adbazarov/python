@@ -15,15 +15,24 @@ import threading
 #txData=[0x01,0x01]
 GPIO.setmode(GPIO.BCM)# имена пинов по их номеру GPIO
 
-PIN=27
-GPIO.setup(PIN,GPIO.OUT)
-GPIO.output(PIN,GPIO.LOW)
+
+CS={
+    'ADC1':25,
+    'ADC2':24,
+    'ADC3':23,
+    'ADC4':22,
+    'ADC5':27    
+}
+
+GPIO.setup(CS['ADC5'],GPIO.OUT)
+
+
 
 for i in range(1000):
     time.sleep(1) 
-    GPIO.output(PIN,GPIO.HIGH)
+    GPIO.output(CS['ADC5'],GPIO.HIGH)
     time.sleep(1)
-    GPIO.output(PIN,GPIO.LOW)
+    GPIO.output(CS['ADC5'],GPIO.LOW)
 
 
 #    GPIO.output(7,0)
